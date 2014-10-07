@@ -1,0 +1,24 @@
+#!/sbin/runscript
+# Copyright (c) 2014 Online Labs Cloud Team <cloud-team@labs.online.net>
+# Released under the 2-clause BSD license.
+
+description="Extract SSH keys from metadata."
+
+depend() {
+	use root
+	need sync-metadata
+	before sshd
+}
+
+start() {
+	ebegin "Extracting SSH keys from metadata"
+
+	if [ ! -f /root/.ssh/authorized_keys ]
+	then
+		mkdir -p /root/.ssh/
+	fi
+
+	grep 'SSH_PUBLIC_KEYS_.*_KEY=' /run/labs.online.net.metadata.sh | cut -f2- -d '=' | tr -d \' > /root/.ssh/authorized_keys
+
+	eend $?
+}

@@ -1,0 +1,28 @@
+#!/sbin/runscript
+# Copyright 1999-2014 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+description="Disconnects NBD root volumes."
+
+depend() {
+	need killprocs savecache mount-ro
+}
+
+start() {
+	for param in $(cat /proc/cmdline); do
+		case "$param" in
+			root=/dev/nbd[0-9])
+				nbdroot="${param#root=}"
+				;;
+		esac
+	done
+
+	[ -z "${nbdroot}" ] && return
+
+	# Make sure important files are still in cache
+	cat /sbin/reboot /etc/init.d/reboot.sh >/dev/null
+	cat /sbin/halt /etc/init.d/shutdown.sh >/dev/null
+
+	nbd-client -d ${nbdroot}
+}

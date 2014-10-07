@@ -1,0 +1,38 @@
+#!/sbin/runscript
+#
+
+description="Retrieves metadata for current instance"
+
+depend()
+{
+	need root
+	before sshd
+	provide labs.online.net.metadata
+}
+
+start() {
+	local ret=1
+	ebegin "Retrieving metadata"
+	while [ ${ret} != 0 ]
+	do
+		wget \
+			--quiet \
+			-O /run/labs.online.net.metadata.sh \
+			http://169.254.42.42/conf
+		ret=$?
+	done
+	eend $?
+
+	ret=1
+	ebegin "Retrieving metadata as JSON"
+	while [ ${ret} != 0 ]
+	do
+		wget \
+			--quiet \
+			-O /run/labs.online.net.metadata.json \
+			http://169.254.42.42/conf?format=json
+		ret=$?
+		sleep 1
+	done
+	eend $?
+}

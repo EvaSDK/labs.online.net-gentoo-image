@@ -1,0 +1,65 @@
+#!/sbin/runscript
+# Copyright 1999-2014 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+depend() {
+	need labs.online.net.metadata
+	config /etc/ndbtab
+}
+
+start() {
+	# Make sure nbd support is loaded in the kernel
+	if [ -e /proc/modules ] && ! grep -qs 'nbd$' /proc/filesystems ; then
+		modprobe -q nbd
+	fi
+
+	local NBD_DEVICE NBD_HOST NBD_PORT NBD_TYPE
+
+	ebegin "Mounting NBD devices"
+	eindent
+	while read NBD_DEVICE NBD_HOST NBD_PORT NBD_TYPE
+	do
+		# cfq deadlocks NBD devices, so switch to something else if cfq is
+		# selected by default
+		# This doesn't take into account non-udev devnames, but since
+		# there's really no other option these days...
+		if grep -q '\[cfq\]' "/sys/block/${NBD_DEVICE/\/dev\//}/queue/scheduler"; then
+			echo deadline > "/sys/block/${NBD_DEVICE/\/dev\//}/queue/scheduler"
+		fi
+
+		if nbd-client -c "${NBD_DEVICE}" >/dev/null
+		then
+			einfo "${NBD_DEVICE} already connected"
+		else
+			ebegin "Connecting ${NBD_DEVICE}"
+			nbd-client "${NBD_HOST}" "${NBD_PORT}" "${NBD_DEVICE}" -timeout 10 >/dev/null
+			eend $?
+		fi
+	done < /etc/nbdtab
+	eoutdent
+	eend $?
+}
+
+stop() {
+	local nbdroot
+
+	for param in $(cat /proc/cmdline); do
+		case "$param" in
+			root=/dev/nbd[0-9])
+				nbdroot="${param#root=}"
+				;;
+		esac
+	done
+
+	local NBD_DEVICE NBD_HOST NBD_PORT NBD_TYPE
+
+	while read NBD_DEVICE NBD_HOST NBD_PORT NBD_TYPE
+	do
+		[ "${NBD_DEVICE}" = "${nbdroot}" ] && continue
+
+		ebegin "Disconnecting ${NBD_DEVICE}"
+		nbd-client -d "${NBD_DEVICE}"
+		eend $?
+	done < /etc/nbdtab
+}

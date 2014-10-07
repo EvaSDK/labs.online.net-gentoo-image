@@ -1,0 +1,28 @@
+#!/sbin/runscript
+# Copyright 1999-2014 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+description="Generate NBDtab"
+
+depend() {
+	need labs.online.net.metadata
+	before nbdmount
+}
+
+start() {
+	local volume_list metadata
+	metadata=/run/labs.online.net.metadata.sh
+	
+	volume_list=$(grep "VOLUMES=" ${metadata} | cut -f2 -d '=')
+	rm /etc/nbdtab
+	touch /etc/nbdtab
+	ebegin "Synchronizing /etc/nbdtab"
+	for idx in ${volume_list}
+	do
+		NBD_HOST=$(grep "VOLUMES_${idx}_EXPORT_URI" ${metadata} | sed "s|.*nbd://\(.*\):\(.*\)|\1|")
+		NBD_PORT=$(grep "VOLUMES_${idx}_EXPORT_URI" ${metadata} | sed "s|.*nbd://\(.*\):\(.*\)|\2|")
+		echo "/dev/nbd${idx}	${NBD_HOST} ${NBD_PORT} raw" >> /etc/nbdtab
+	done
+	eend $?
+}
