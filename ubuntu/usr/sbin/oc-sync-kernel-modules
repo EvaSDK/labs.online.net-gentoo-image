@@ -1,4 +1,5 @@
-cription "synchronizes kernel module"
+#!/bin/sh
+# description "synchronizes kernel module"
 # author "Online Labs Cloud Team <cloud-team@labs.online.net>"
 
 DIR=/lib/modules
