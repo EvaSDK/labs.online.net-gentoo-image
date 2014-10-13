@@ -1,0 +1,9 @@
+Package: ocs-image-config
+Version: 1.0
+Section: base
+Priority: optional
+Architecture: all
+Depends: bash
+Maintainer: OCS
+Description: Online Labs files
+Homepage: http://labs.online.net/
