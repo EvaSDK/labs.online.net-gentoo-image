@@ -8,6 +8,11 @@ TMP_DIR=`mktemp -d -p $DIR`
 KVERSION=`uname -r`
 TIMEOUT=10
 
+clean() {
+    rm -rf "$TMP_DIR" 2>/dev/null
+}
+trap 'clean' INT TERM EXIT
+
 if [ ! -d $DIR/${KVERSION} ]
 then
   wget --timeout=${TIMEOUT} --quiet --no-check-certificate -r --no-parent \
@@ -19,6 +24,6 @@ then
   then
     mkdir -p $DIR/${KVERSION}
     mv $TMP_DIR/${KVERSION} $DIR
-    rm -rf $TMP_DIR
   fi
 fi
+
