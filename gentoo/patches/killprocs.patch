@@ -1,0 +1,13 @@
+Allow skip killing the nbd-client in changer of /
+
+--- /etc/init.d/killprocs	2014-10-17 15:19:57.000000000 +0200
++++ /etc/init.d/killprocs	2014-10-17 15:19:30.000000000 +0200
+@@ -11,6 +11,8 @@
+ 
+ start()
+ {
++	killall5_opts="${killall5_opts} -o $(pgrep -f "nbd-client.*/dev/nbd0")"
++
+ 	ebegin "Terminating remaining processes"
+ 	killall5 -15 ${killall5_opts}
+ 	sleep 1
