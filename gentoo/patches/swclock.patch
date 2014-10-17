@@ -1,0 +1,14 @@
+runscript is a simple symlink and it seems to not work very well for
+swclock.
+
+--- /etc/init.d/swclock	2014-10-17 15:21:50.000000000 +0200
++++ /etc/init.d/swclock	2014-10-17 15:21:25.000000000 +0200
+@@ -17,7 +17,7 @@
+ {
+ 	ebegin "Setting the local clock based on last shutdown time"
+ 	if ! swclock 2> /dev/null; then
+-	swclock --warn /sbin/runscript
++	swclock --warn /sbin/rc
+ 	fi
+ 	eend $?
+ }
