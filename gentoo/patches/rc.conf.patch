@@ -1,5 +1,5 @@
---- rc.conf.old	2014-10-17 14:38:02.000000000 +0200
-+++ rc.conf	2014-10-17 14:37:43.000000000 +0200
+--- /etc/rc.conf	2014-10-17 14:38:02.000000000 +0200
++++ /etc/rc.conf	2014-10-17 14:37:43.000000000 +0200
 @@ -155,7 +155,7 @@
  
  # This is the number of tty's used in most of the rc-scripts (like
