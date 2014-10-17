@@ -1,0 +1,16 @@
+--- /etc/ssh/sshd_config	2014-10-17 11:43:07.000000000 +0200
++++ /etc/ssh/sshd_config	2014-10-17 11:45:17.000000000 +0200
+ # Authentication:
+ 
+ #LoginGraceTime 2m
+-#PermitRootLogin yes
++PermitRootLogin without-password
+ #StrictModes yes
+ #MaxAuthTries 6
+ #MaxSessions 10
+@@ -148,4 +148,4 @@
+ #	ForceCommand cvs server
+ 
+ # Allow client to pass locale environment variables #367017
+-AcceptEnv LANG LC_*
++# AcceptEnv LANG LC_*
