@@ -1,0 +1,14 @@
+Do not try to write data to read-only /
+
+At this point of the boot sequence / is still read-only for us so just
+skip that function.
+--- /etc/init.d/bootmisc	2014-10-17 15:11:45.000000000 +0200
++++ /etc/init.d/bootmisc	2014-10-17 15:11:23.000000000 +0200
+@@ -117,6 +117,7 @@
+ 
+ clean_run()
+ {
++	return 0
+ 	[ "$RC_SYS" = VSERVER ] && return 0
+ 	local dir
+ 	dir=$(mktemp -d)
