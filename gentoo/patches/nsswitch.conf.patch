@@ -1,0 +1,11 @@
+--- /etc/nsswitch.conf	2014-10-17 11:33:22.000000000 +0200
++++ /etc/nsswitch.conf	2014-10-17 11:33:17.000000000 +0200
+@@ -9,7 +9,7 @@
+ # shadow:    db files nis
+ # group:     db files nis
+ 
+-hosts:       files dns
++hosts:       files dns myhostname
+ networks:    files dns
+ 
+ services:    db files
