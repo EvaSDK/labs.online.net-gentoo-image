@@ -1,0 +1,5 @@
+Default network configuration with hostname fed by DHCP
+--- /dev/null
++++ /etc/conf.d/net
++config_eth0="dhcp"
++dhcpcd_eth0="${dhcpcd_eth0} -4 -e force_hostname=1"
