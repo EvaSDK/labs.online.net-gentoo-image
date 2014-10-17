@@ -1,0 +1,3 @@
+--- /dev/null
++++ /etc/sysctl.d/labs.online.net.conf
++vm.min_free_kbytes=65536
