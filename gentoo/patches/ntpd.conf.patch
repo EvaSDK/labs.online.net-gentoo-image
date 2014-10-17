@@ -1,0 +1,23 @@
+Use internal NTP server for quick clock adjustment.
+
+--- /etc/conf.d/sntp	2014-10-17 15:55:52.000000000 +0200
++++ /etc/conf.d/sntp	2014-10-17 15:55:45.000000000 +0200
+@@ -1,4 +1,4 @@
+ # /etc/conf.d/sntp
+ 
+ # Options to pass to sntp
+-SNTP_OPTS="-s 0.gentoo.pool.ntp.org 1.gentoo.pool.ntp.org 2.gentoo.pool.ntp.org 3.gentoo.pool.ntp.org"
++SNTP_OPTS="-s ntp.int.cloud.online.net"
+--- /etc/ntp.conf	2014-10-17 15:55:38.000000000 +0200
++++ /etc/ntp.conf	2014-10-17 15:55:29.000000000 +0200
+@@ -7,8 +7,8 @@
+ # Please respect the access policy as stated by the responsible person.
+ #server		ntp.example.tld		iburst
+ 
+-# Common pool for random people
+-#server pool.ntp.org
++# Specify one or more NTP servers.
++server ntp.int.cloud.online.net 
+ 
+ # Pools for Gentoo users
+ server 0.gentoo.pool.ntp.org
