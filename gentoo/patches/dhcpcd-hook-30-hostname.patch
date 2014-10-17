@@ -1,0 +1,17 @@
+Set hostname and FQDN in /etc/hosts from DHCP.
+
+Some software do not rely on nsswitch to retrieve local hostname.
+
+--- /lib/dhcpcd/dhcpcd-hooks/30-hostname	2014-10-17 11:29:02.000000000 +0200
++++ /lib/dhcpcd/dhcpcd-hooks/30-hostname	2014-10-17 11:29:32.000000000 +0200
+@@ -49,6 +49,10 @@
+ 		# with an error to stdout
+ 		hostname "$1"
+ 	fi
++
++	# Set hostname in configuration file
++	sed "s/\(hostname=\)\".*\"/\1\"$1\"/" -i /etc/conf.d/hostname
++	sed "/127.0.0.1[ \t]\+localhost/ s/\(localhost\).*/\1 $1/" -i /etc/hosts
+ }
+ 
+ need_hostname()
