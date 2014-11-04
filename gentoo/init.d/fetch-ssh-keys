@@ -5,8 +5,7 @@
 description="Extract SSH keys from metadata."
 
 depend() {
-	use root
-	need sync-metadata
+	need root sync-metadata
 	before sshd
 }
 
