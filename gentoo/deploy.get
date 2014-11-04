@@ -6,8 +6,20 @@ ssh root@${1} "chmod 755 /etc/init.d/*"
 scp sets/* root@${1}:/etc/portage/sets/
 scp patches/* root@${1}:/tmp/
 
-ssh root@${1} eselect locale set en_US.utf8
-ssh root@${1} eselect pager set /usr/bin/less
-ssh root@${1} eselect python set python2.7
+ssh root@${1} <<EOF
+eselect locale set en_US.utf8
+eselect pager set /usr/bin/less
+eselect python set python2.7
+EOF
+
+ssh root@${1} <<EOF
+rc-update add sync-kernel-modules boot
+rc-update add fetch-kernel-modules boot
+rc-update add sync-metadata boot
+rc-update add fetch-ssh-keys default
+rc-update add sync-nbd-client default
+rc-update add nbdmount default
+rc-update add nbd-root-disconnect shutdown
+EOF
 
 #ssh root@${1} "cd / ; for pa in /tmp/*.patch ; do patch -r - -N -p0 < ${pa} ; done"
