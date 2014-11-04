@@ -2,12 +2,12 @@
 # Copyright (c) 2014 Online Labs Cloud Team <cloud-team@labs.online.net>
 # Released under the 2-clause BSD license.
 
-descriptionr="Synchronizes kernel modules"
+descriptionr="Synchronizes kernel modules to local filesystem"
 
 depend()
 {
-	before modules
 	after root
+	use labs.online.net.modules
 }
 
 start()
@@ -16,27 +16,29 @@ start()
 	# support compiled in ...
 	[ ! -f /proc/modules ] && return 0
 
+	local ret DIR KVERSION RAM_KMODULES
 	DIR=/lib/modules
 	KVERSION=$(uname -r)
-	TIMEOUT=10
+	RAM_KMODULES="/run/modules"
 
-	if [ ! -d $DIR/${KVERSION} ]
+	if grep -q "${DIR}" /proc/mounts
 	then
-		ebegin "Feching modules for kernel ${KVERSION}"
-		mkdir -p /run/sync-kernel-modules
-		wget --quiet \
-			--timeout=${TIMEOUT} --no-check-certificate -r --no-parent \
-			--reject "index.html*" --reject "robots.txt" \
-			--no-host-directories --cut-dirs 3 \
-			--directory-prefix /run/sync-kernel-modules/ \
-			http://mirror.cloud.online.net/kernel/${KVERSION}/modules/${KVERSION}/
+		umount "${DIR}"
+	fi
 
-		if [ $? -eq 0 ]
+	if [ ! -d "${DIR}/${KVERSION}" -a -d "${RAM_KMODULES}/${KVERSION}" ]
+	then
+		ebegin "Writing modules to filesystem"
+		mkdir -p "${DIR}/${KVERSION}"
+		cp -a "${RAM_KMODULES}/${KVERSION}" "${DIR}"
+		ret=$?
+		if [ $ret -eq 0 ]
 		then
-			mkdir -p ${DIR}/${KVERSION}
-			cp -a /run/sync-kernel-modules/${KVERSION} "${DIR}"
-			rm -rf /run/sync-kernel-modules
+			rm -rf "${RAM_KMODULES}"
+		else
+			rm -rf "${DIR}/${KVERSION}"
+			mount -o ro,bind "${RAM_KMODULES}" "${DIR}"
 		fi
-		eend $?
+		eend $ret
 	fi
 }

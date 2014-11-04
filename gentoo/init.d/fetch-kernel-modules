@@ -1,0 +1,40 @@
+#!/sbin/runscript
+# Copyright (c) 2014 Online Labs Cloud Team <cloud-team@labs.online.net>
+# Released under the 2-clause BSD license.
+
+descriptionr="Synchronizes kernel modules"
+
+depend()
+{
+	before modules
+	provide labs.online.net.modules
+}
+
+start()
+{
+	# Should not fail if kernel do not have module
+	# support compiled in ...
+	[ ! -f /proc/modules ] && return 0
+
+	DIR=/lib/modules
+	KVERSION=$(uname -r)
+	RAM_KMODULES=/run/modules
+	TIMEOUT=10
+
+	if [ ! -d "${DIR}/${KVERSION}" ]
+	then
+		ebegin "Feching modules for kernel ${KVERSION}"
+		mkdir -p "${RAM_KMODULES}"
+		wget --quiet \
+			--timeout=${TIMEOUT} --no-check-certificate -r --no-parent \
+			--reject "index.html*" --reject "robots.txt" \
+			--no-host-directories --cut-dirs 3 \
+			--directory-prefix "${RAM_KMODULES}" \
+			http://mirror.cloud.online.net/kernel/${KVERSION}/modules/${KVERSION}/
+
+		mount -o bind "${RAM_KMODULES}" "${DIR}"
+		eend $?
+	else
+		einfo "Kernel modules ${KVERSION} up-to-date"
+	fi
+}
