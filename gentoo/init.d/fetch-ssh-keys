@@ -17,7 +17,7 @@ start() {
 		mkdir -p /root/.ssh/
 	fi
 
-	grep 'SSH_PUBLIC_KEYS_.*_KEY=' /run/labs.online.net.metadata.sh | cut -f2- -d '=' | tr -d \' > /root/.ssh/authorized_keys
+	sed -n "s/SSH_PUBLIC_KEYS_.*_KEY=['\"]\(.*\)['\"]$/\1/p" /run/labs.online.net.metadata.sh > /root/.ssh/authorized_keys
 
 	eend $?
 }
