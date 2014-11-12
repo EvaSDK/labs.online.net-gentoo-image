@@ -21,8 +21,18 @@ start() {
 	[ -z "${nbdroot}" ] && return
 
 	# Make sure important files are still in cache
-	cat /sbin/reboot /etc/init.d/reboot.sh >/dev/null
-	cat /sbin/halt /etc/init.d/shutdown.sh >/dev/null
+	cat /sbin/{halt,reboot,shutdown} >/dev/null
 
-	nbd-client -d ${nbdroot}
+	# Do not do anything for halt as it would cause ugly kernel oops
+	# This is not as critical as it looks since / is remounted
+	# read-only by the time we get here so no data loss is to be expected.
+	# NBD connection will be released by shutdown sequence.
+	if yesno $RC_REBOOT ; then
+		ebegin "Disconnecting root NBD volume"
+		/usr/sbin/nbd-client -d /dev/nbd0
+		eend $?
+
+		# UGLY UGLY UGLY !
+		echo b > /proc/sysrq-trigger
+	fi
 }
