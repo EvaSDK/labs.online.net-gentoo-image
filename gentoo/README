@@ -1,0 +1,28 @@
+Welcome on labs.online.net Gentoo image.
+
+This system is based on a stage3 armv7 and entirely rebuilt with appropriate CFLAGS for C1 instances.
+
+Some extra packages were installed to make things work properly.
+They are listed in @labs.online.net set.
+
+A few modifications have been applied to init scripts in order to make it integrate and boot properly on labs.online.net platform.
+Here is the list of added or modified scripts:
+ * bootmisc: attempted to create directory on ro / (most likely a bug)
+ * killprocs: avoid killing NBD client for / (missing support for process filter)
+ * keymaps: no physical TTY to work withi, just removed from runlevel
+ * fetch-ssh-keys
+ * sync-kernel-modules
+ * sync-metadata
+ * sync-nbd-client
+ * nbdmount
+ * nbd-disconnect-root
+
+DHCP is responsible for setting the hostname and nss-myhostname has been added in order to allow its resolution until we set proper DNS servers.
+Also, /lib/dhcpcd/dhcpcd-hooks/30-hostname hook was modified to set hostname in /etc/hosts and /etc/conf.d/hostname so that software relying on gethostent system call will work as expected.
+
+Since this hardware has no RTC, initramfs is responsible of setting a realistic date via NTP but the system should also run its own instance of ntpd to stay in sync.
+
+/etc/rc.conf was modified avoid modifications to non-existing TTYs, since these units have no physical terminal.
+
+Finally, /usr/portage is intentionaly left out of this volume due to space it takes and fragmentation it would create over time.
+It is recommended to create a separate volume to hold the tree and use emerge-webrsync to populate it or use a squasfs snapshot.
